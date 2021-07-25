@@ -1,3 +1,16 @@
+# Recorre las 1000 paginas de articulos que podemos ver y va guardando todos los artículos en un diccionario
+# De cada artículo guarda:
+#   Url
+#   Id de Pubmed
+#   Título
+#   Abstract
+#   Keywords si hay (en una lista)
+#   Mesh terms si hay (en una lista)
+#   Diccionario de autores con nombres y afiliaciones y país (el país puede estar mal en algunos casos, se puede corregir o dejar así)
+
+# El código no para hasta que lo frenes o que llegue a la página 1.000, pero cada vez que carga un artículo lo guarda, así que se puede
+# frenar en cualquier momento
+
 from bs4 import BeautifulSoup
 import pickle as pk
 import requests
@@ -9,12 +22,11 @@ from time import sleep
 import os
 
 #%%
-
 base_url = 'https://pubmed.ncbi.nlm.nih.gov'
 filter_url = '/?term=(((%222016%22%5BDate%20-%20Publication%5D%20%3A%20%223000%22%5BDate%20-%20Publication%5D))%20AND%20(%22english%22%5BLanguage%5D))%20AND%20(%22journal%20article%22%5BPublication%20Type%5D)&sort='
 
 max_pages = 1000
-max_iters = 2
+pause_duration = 5 # segundos entre requests
 
 #%%
 
@@ -39,6 +51,9 @@ class articles_data():
 articles = generic_class()
 
 #%%
+
+# Si ya existe articles.pkl lo cargo y avanzo desde la última página
+# Si no existe creo el dict() de cero
 current = os.getcwd()
 filename = current + '/articles.pkl'
 if os.path.exists(filename):
@@ -115,7 +130,11 @@ def get_article_data(article_link):
   return article
 
 #%%
-i = 0
+stored_articles = articles_data()
+
+print('Descargando articulos...')
+print('Ctrl + C para frenar (todo el proceso es guardado)')
+
 for page in tqdm( remaining_pages ):
   url = base_url + filter_url + '&page=' + str(page)
   r = requests.get(url)
@@ -127,15 +146,11 @@ for page in tqdm( remaining_pages ):
   for article_link in links_to_articles:
     article = get_article_data( article_link )
     if article['id'] not in articles.keys():
-      articles[ article['id'] ] = article
-    sleep(5)
+        articles[ article['id'] ] = article
+        stored_articles.store(processed_pages, articles)
+        stored_articles.write('articles.pkl')
+        print('Agregado artículo', article['id'])
+    sleep(pause_duration)
 
   if page not in processed_pages:
     processed_pages.append(page)
-  i += 1
-  if i >= max_iters:
-    break
-
-stored_articles = articles_data()
-stored_articles.store(processed_pages, articles)
-stored_articles.write('articles.pkl')
