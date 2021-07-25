@@ -90,7 +90,7 @@ def get_article_data(article_link):
 
   
   # Guardo autores en un diccionario, con nombre e institución (afilliation)
-  authors = dict()
+  authors = []
 
   authors_list = souped.find('div', attrs={'class': 'authors-list'})
   authors_in_article = authors_list.find_all('span', attrs={'class': 'authors-list-item'})
@@ -99,19 +99,28 @@ def get_article_data(article_link):
     author = dict()
     author_data = author_i.find('a', attrs={'class': 'full-name'})
 
-    affiliation_data = author_i.find('a', attrs={'class': 'affiliation-link'})
+    affiliation_data = author_i.find_all('a', attrs={'class': 'affiliation-link'})
 
     author['name'] = author_data['data-ga-label']
-    author['affiliation'] = affiliation_data['title']
-    author['country'] = re.sub('[^\w\s]', '', affiliation_data['title'].split(',')[-1].strip())
+
+    if len(affiliation_data) > 0:
+      author_affiliation = []
+      for affiliation in affiliation_data:
+        affiliation_dict = dict()
+        affiliation_dict['affiliation'] = affiliation['title']
+        affiliation_dict['country'] = re.sub('[^\w\s]', '', affiliation['title'].split(',')[-1].strip())
+        author_affiliation.append( affiliation_dict )
+      author['affiliation'] = author_affiliation
     
-    authors[author['name']] = author
+    authors.append( author )
 
   article['authors'] = authors
 
-  # Guardo abstract
-  abstract = souped.find('div', attrs={'class': 'abstract-content selected'}).find('p').text.strip()
-  article['abstract'] = re.sub(' +', ' ', re.sub('\n', '', abstract))
+  # Guardo abstract si hay
+  abstract = souped.find('div', attrs={'class': 'abstract-content selected'})
+  if abstract != None:
+    abstract = abstract.find('p').text.strip()
+    article['abstract'] = re.sub(' +', ' ', re.sub('\n', '', abstract))
 
   # Guardo Keywords si hay
   keywords = souped.find('strong', string='\n          Keywords:\n        ')
@@ -141,16 +150,20 @@ for page in tqdm( remaining_pages ):
   souped = BeautifulSoup(r.content.decode("utf-8"), features="html.parser")
 
   articles_in_page = souped.find_all('a', attrs={'class': 'docsum-title'})
-  links_to_articles = [ base_url + article['href'] for article in articles_in_page ]
+  articles_ids = [ re.sub('^[\d]', '', article['href']) for article in articles_in_page ]
+  
+  #links_to_articles = [ base_url + article['href'] for article in articles_in_page ]
 
-  for article_link in links_to_articles:
-    article = get_article_data( article_link )
-    if article['id'] not in articles.keys():
-        articles[ article['id'] ] = article
-        stored_articles.store(processed_pages, articles)
-        stored_articles.write('articles.pkl')
-        print('Agregado artículo', article['id'])
-    sleep(pause_duration)
+  for article_id in articles_ids:
+    if article_id not in articles.keys():
+      article_link = base_url + '/' + article_id
+      article = get_article_data( article_link )
+    
+      articles[ article_id ] = article
+      stored_articles.store(processed_pages, articles)
+      stored_articles.write('articles.pkl')
+      print('Agregado artículo', article['id'])
+      sleep(pause_duration)
 
   if page not in processed_pages:
     processed_pages.append(page)
