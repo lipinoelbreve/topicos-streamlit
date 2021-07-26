@@ -89,32 +89,33 @@ def get_article_data(article_link):
     article['pub_year'] = int(re.findall('\d{4}', pub_date)[0])
 
   
-  # Guardo autores en un diccionario, con nombre e institución (afilliation)
-  authors = []
-
+  # Guardo autores en un diccionario, con nombre e institución (afilliation), si hay autores
+  
   authors_list = souped.find('div', attrs={'class': 'authors-list'})
-  authors_in_article = authors_list.find_all('span', attrs={'class': 'authors-list-item'})
+  if authors_list != None:
+    authors = []
+    authors_in_article = authors_list.find_all('span', attrs={'class': 'authors-list-item'})
 
-  for author_i in authors_in_article:
-    author = dict()
-    author_data = author_i.find('a', attrs={'class': 'full-name'})
+    for author_i in authors_in_article:
+      author = dict()
+      author_data = author_i.find('a', attrs={'class': 'full-name'})
 
-    affiliation_data = author_i.find_all('a', attrs={'class': 'affiliation-link'})
+      affiliation_data = author_i.find_all('a', attrs={'class': 'affiliation-link'})
 
-    author['name'] = author_data['data-ga-label']
+      author['name'] = author_data['data-ga-label']
 
-    if len(affiliation_data) > 0:
-      author_affiliation = []
-      for affiliation in affiliation_data:
-        affiliation_dict = dict()
-        affiliation_dict['affiliation'] = affiliation['title']
-        affiliation_dict['country'] = re.sub('[^\w\s]', '', affiliation['title'].split(',')[-1].strip())
-        author_affiliation.append( affiliation_dict )
-      author['affiliation'] = author_affiliation
-    
-    authors.append( author )
+      if len(affiliation_data) > 0:
+        author_affiliation = []
+        for affiliation in affiliation_data:
+          affiliation_dict = dict()
+          affiliation_dict['affiliation'] = affiliation['title']
+          affiliation_dict['country'] = re.sub('[^\w\s]', '', affiliation['title'].split(',')[-1].strip())
+          author_affiliation.append( affiliation_dict )
+        author['affiliation'] = author_affiliation
+      
+      authors.append( author )
 
-  article['authors'] = authors
+    article['authors'] = authors
 
   # Guardo abstract si hay
   abstract = souped.find('div', attrs={'class': 'abstract-content selected'})
@@ -163,6 +164,7 @@ for page in tqdm( remaining_pages ):
       stored_articles.store(processed_pages, articles)
       stored_articles.write('articles.pkl')
       print('Agregado artículo', article['id'])
+      print(article)
       sleep(pause_duration)
 
   if page not in processed_pages:
