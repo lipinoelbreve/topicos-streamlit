@@ -6,7 +6,7 @@
 #   Abstract
 #   Keywords si hay (en una lista)
 #   Mesh terms si hay (en una lista)
-#   Diccionario de autores con nombres y afiliaciones y país (el país puede estar mal en algunos casos, se puede corregir o dejar así)
+#   Lista de autores con nombres y afiliaciones y país (el país puede estar mal en algunos casos, se puede corregir o dejar así)
 
 # El código no para hasta que lo frenes o que llegue a la página 1.000, pero cada vez que carga un artículo lo guarda, así que se puede
 # frenar en cualquier momento
@@ -29,7 +29,6 @@ max_pages = 1000
 pause_duration = 5 # segundos entre requests
 
 #%%
-
 class generic_class():
   def __init__(self):
     pass
@@ -51,7 +50,6 @@ class articles_data():
 articles = generic_class()
 
 #%%
-
 # Si ya existe articles.pkl lo cargo y avanzo desde la última página
 # Si no existe creo el dict() de cero
 current = os.getcwd()
@@ -153,8 +151,6 @@ for page in tqdm( remaining_pages ):
   articles_in_page = souped.find_all('a', attrs={'class': 'docsum-title'})
   articles_ids = [ re.sub('^[\d]', '', article['href']) for article in articles_in_page ]
   
-  #links_to_articles = [ base_url + article['href'] for article in articles_in_page ]
-
   for article_id in articles_ids:
     if article_id not in articles.keys():
       article_link = base_url + '/' + article_id
@@ -164,7 +160,6 @@ for page in tqdm( remaining_pages ):
       stored_articles.store(processed_pages, articles)
       stored_articles.write('articles.pkl')
       print('Agregado artículo', article['id'])
-      print(article)
       sleep(pause_duration)
 
   if page not in processed_pages:
