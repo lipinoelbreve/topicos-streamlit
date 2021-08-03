@@ -1,13 +1,11 @@
 # %%
-# Recorre las 1000 paginas de articulos que podemos ver y va guardando todos los artículos en un diccionario
+# Recorre las 1000 paginas de articulos que podemos ver
 # De cada artículo guarda:
 #   Url
 #   Id de Pubmed
 #   Título
-#   Abstract
-#   Keywords si hay (en una lista)
-#   Mesh terms si hay (en una lista)
-#   Lista de autores con nombres y afiliaciones y país (el país puede estar mal en algunos casos, se puede corregir o dejar así)
+#   Keywords
+#   Lista de autores con nombres y afiliaciones y país
 
 # El código no para hasta que lo frenes o que llegue a la página 1.000, pero cada vez que carga un artículo lo guarda, así que se puede
 # frenar en cualquier momento
@@ -30,8 +28,7 @@ pause_duration = 5 # segundos entre requests
 
 
 #%%
-# Si ya existe articles.pkl lo cargo y avanzo desde la última página
-# Si no existe creo el dict() de cero
+# Cargo lo que se avanzo hasta ahora
 current = os.getcwd()
 filename = current + '/articles.pkl'
 article_collection = ArticleCollection()

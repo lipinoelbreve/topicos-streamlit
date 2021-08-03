@@ -18,23 +18,35 @@ def extract_affiliation_short_name(title):
   if len(result) > 0:
     result = result[0].strip()
   else:
-    result = [word for word in words if re.search('hosp', word.strip().lower())]
+    result = [word for word in words if re.search('colle', word.strip().lower())]
     if len(result) > 0:
       result = result[0].strip()
     else:
-      result = [word for word in words if re.search('labor', word.strip().lower())]
+      result = [word for word in words if re.search('hosp', word.strip().lower())]
       if len(result) > 0:
         result = result[0].strip()
       else:
-        result = [word for word in words if re.search('insti', word.strip().lower())]
+        result = [word for word in words if re.search('labor', word.strip().lower())]
         if len(result) > 0:
           result = result[0].strip()
         else:
-          result = [word for word in words if re.search('founda', word.strip().lower())]
+          result = [word for word in words if re.search('insti', word.strip().lower())]
           if len(result) > 0:
             result = result[0].strip()
           else:
-            result = None
+            result = [word for word in words if re.search('founda', word.strip().lower())]
+            if len(result) > 0:
+              result = result[0].strip()
+            else:
+              result = [word for word in words if re.search('centr', word.strip().lower())]
+              if len(result) > 0:
+                result = result[0].strip()
+              else:
+                result = [word for word in words if re.search('centr', word.strip().lower())]
+                if len(result) > 0:
+                  result = result[0].strip()
+                else:
+                  result = None
 
   return result
 
