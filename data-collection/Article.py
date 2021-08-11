@@ -11,44 +11,45 @@ nltk.download('averaged_perceptron_tagger')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
 
+institute_keywords = [
+    'unive',
+    'colle',
+    'hosp',
+    'labor',
+    'insti',
+    'founda',
+    'centr',
+    'cente',
+    'clinic',
+    'depart',
+    'health',
+    'servi',
+    'assoc',
+    'organi',
+    'allia',
+    'socie',
+    'resear',
+    'corpor',
+    'pharm',
+    'facult',
+    'school',
+    'grupo',
+    'biolog',
+    'infirm',
+    'ltd',
+    'samsung',
+    'nvidia'
+]
+
 def extract_affiliation_short_name(title):
     words = re.split('[^\w\s\']', title)
-  
-    result = [word for word in words if re.search('unive', word.strip().lower())]
-    if len(result) > 0:
-        result = result[-1].strip()
-    else:
-        result = [word for word in words if re.search('colle', word.strip().lower())]
+    for keyword in institute_keywords:
+        result = [word for word in words if re.search(keyword, word.strip().lower())]
         if len(result) > 0:
             result = result[-1].strip()
-        else:
-            result = [word for word in words if re.search('hosp', word.strip().lower())]
-            if len(result) > 0:
-              result = result[-1].strip()
-            else:
-                result = [word for word in words if re.search('labor', word.strip().lower())]
-                if len(result) > 0:
-                    result = result[-1].strip()
-                else:
-                    result = [word for word in words if re.search('insti', word.strip().lower())]
-                    if len(result) > 0:
-                        result = result[-1].strip()
-                    else:
-                        result = [word for word in words if re.search('founda', word.strip().lower())]
-                        if len(result) > 0:
-                            result = result[-1].strip()
-                        else:
-                            result = [word for word in words if re.search('centr', word.strip().lower())]
-                            if len(result) > 0:
-                                result = result[-1].strip()
-                            else:
-                                result = [word for word in words if re.search('depart', word.strip().lower())]
-                                if len(result) > 0:
-                                    result = result[-1].strip()
-                                else:
-                                    result = None
-
-    return result
+            return result
+        
+    return None
 
 class Author():
   def __init__(self):
@@ -99,28 +100,33 @@ class ArticleCollection():
             for author_i in authors_in_article:
                 author = Author()
                 author_data = author_i.find('a', attrs={'class': 'full-name'})
-                affiliation_data = author_i.find_all('a', attrs={'class': 'affiliation-link'})
+                if author_data != None:
+                    affiliation_data = author_i.find_all('a', attrs={'class': 'affiliation-link'})
 
-                author.name = author_data['data-ga-label']
+                    author.name = author_data['data-ga-label']
 
-                if len(affiliation_data) > 0:
-                    affiliation = affiliation_data[0] # En caso de tener más de 1 afiliación, tomamos la primera
-                    title = affiliation['title']
-                    author.affiliation_long_name = title
-                    doc = nlp(title)
+                    if len(affiliation_data) > 0:
+                        affiliation = affiliation_data[0] # En caso de tener más de 1 afiliación, tomamos la primera
+                        title = affiliation['title']
+                        author.affiliation_long_name = title
+                        doc = nlp(title)
 
-                    author.affiliation_short_name = extract_affiliation_short_name( title )
+                        author.affiliation_short_name = extract_affiliation_short_name( title )
 
-                    places = [re.sub('[^\w\s]', '', str(ent)) for ent in doc.ents if ent.label_ == 'GPE' ]
-                    places = ['United States' if place =='USA' else place for place in places]
-                    places = ['United Kingdom' if place =='UK' else place for place in places]
-                    places = geograpy.places.PlaceContext(places)
-                    if len(places.countries) > 0:
-                        author.affiliation_country = places.countries[0]
-                    elif len(places.other) > 0:
-                        author.affiliation_country = places.other[0]
-          
-                authors.append(author)
+                        places = [re.sub('[^\w\s]', '', str(ent)) for ent in doc.ents if ent.label_ == 'GPE' ]
+                        places = ['United States' if place =='USA' else place for place in places]
+                        places = ['United Kingdom' if place =='UK' else place for place in places]
+                        places = geograpy.places.PlaceContext(places)
+                        if len(places.countries) > 0:
+                            author.affiliation_country = places.countries[0]
+                        elif len(places.other) > 0:
+                            author.affiliation_country = places.other[0]
+            
+                        if author.affiliation_short_name != None:
+                            authors.append(author)
+                        else:
+                            print('Affiliation missed:', author.affiliation_long_name)
+
             article.authors = authors
         if len(authors) == 0:
             no_authors = True
