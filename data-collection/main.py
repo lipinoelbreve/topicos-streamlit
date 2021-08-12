@@ -24,7 +24,7 @@ base_url = 'https://pubmed.ncbi.nlm.nih.gov'
 filter_url = '/?term=(((%222016%22%5BDate%20-%20Publication%5D%20%3A%20%223000%22%5BDate%20-%20Publication%5D))%20AND%20(%22english%22%5BLanguage%5D))%20AND%20(%22journal%20article%22%5BPublication%20Type%5D)'
 
 years_to_process = [2016,2017,2018,2019,2020,2021]
-pages_per_year = 100
+pages_per_year = 500
 pause_duration = 1 # segundos entre requests
 
 #%%
