@@ -41,9 +41,11 @@ categorias = [
 
 categorias_vec = [model.get_vector(c) for c in categorias]
 # %%
-
+results_for_report = {}
 for i, (k, v) in enumerate(article_collection.articles.items()):
-    print(i)
+    if i >= 10:
+        break
+    print(i, k)
     article_vectors = {}
     keyword_cosine_distance = {}
     keyword_most_similar = {}
@@ -83,6 +85,7 @@ for i, (k, v) in enumerate(article_collection.articles.items()):
     
         article_vectors[low_key] = key_to_vec
         keyword_cosine_distance[low_key] = [cosine(key_to_vec, cat) for cat in categorias_vec]
+        results_for_report[low_key] = [cosine(key_to_vec, cat) for cat in categorias_vec]
 
         # ACA UNMBRAL PARA CLASIFICAR
         # ARBITRARIO, USAMOS 70
@@ -96,4 +99,38 @@ for i, (k, v) in enumerate(article_collection.articles.items()):
 
 article_collection.save("articles_with_classification.pkl")
 
+# %%
+import pandas as pd
+anal_incontinence = results_for_report['anal incontinence']
+colorectal = results_for_report["colorectal cancer"]
+hindu = [cosine(model.get_vector("hindu"), cat) for cat in categorias_vec]
+social_support = results_for_report["social support "]
+# %%
+
+pd.DataFrame(
+    data={
+        "categorias": categorias,
+        "distancia coseno": anal_incontinence
+    }
+).to_csv("ejemplo_incontinencia_anal.csv", index=False)
+
+pd.DataFrame(
+    data={
+        "categorias": categorias,
+        "distancia coseno": colorectal
+    }
+).to_csv("ejemplo_cancer_colorrectal.csv", index=False)
+
+pd.DataFrame(
+    data={
+        "categorias": categorias,
+        "distancia coseno": hindu
+    }
+).to_csv("ejemplo_hindu.csv", index=False)
+pd.DataFrame(
+    data={
+        "categorias": categorias,
+        "distancia coseno": social_support
+    }
+).to_csv("ejemplo_social_support.csv", index=False)
 # %%
