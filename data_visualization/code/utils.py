@@ -5,17 +5,17 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
+from tqdm import tqdm
+import plotly.graph_objects as go
 
 @st.cache
 def get_data():
-    #author = pd.read_csv('../dummy_data/tabla_1.csv')
-    #illness = pd.read_csv('../dummy_data/tabla_2.csv')
-    #links = pd.read_csv('../dummy_data/tabla_3.csv')
-    author = pd.read_csv('../../data-collection/autores.csv')
-    illness = pd.read_csv('../../data-collection/enfermedades.csv')
-    links = pd.read_csv('../../data-collection/investigaciones.csv')
+    author = pd.read_csv('../../data-collection/autores.csv', index_col=0)
+    illness = pd.read_csv('../../data-collection/enfermedades.csv', index_col=0)
+    links = pd.read_csv('../../data-collection/investigaciones.csv', index_col=0)
     
     main = links.merge(illness, on='Enfermedad').merge(author, on='Institucion')
+    main = main[~main.duplicated()].reset_index(drop=True)
     
     return author, illness, links, main
 
@@ -28,7 +28,9 @@ def build_graph(main, year_range, grupos, paises, author, giant, reduce):
         (main['Grupo'].isin(grupos)) &
         (main.Pais.isin(paises))
         ].reset_index(drop=True)
-    
+
+    plot_data = pd.pivot_table(main, values='Enfermedad', index='Year', columns='Grupo', aggfunc='count')
+
     g = nx.Graph()
 
     afiliaciones_paises = dict(zip(main.Institucion, main.Pais))
@@ -95,11 +97,12 @@ def build_graph(main, year_range, grupos, paises, author, giant, reduce):
          {'Número de Tópicos':[num_nodos['Enfermedad'], num_nodos_gigante['Enfermedad']],
           'Número de Instituciones':[num_nodos['Institucion'], num_nodos_gigante['Institucion']],
           'Número de Ejes':[num_ejes, num_ejes_gigante]},
-                  index=['Red Completa','Componente Gigante'])
+                  index=['Red Completa','Componente Gigante']),
+     'plot_data':plot_data
     }
     
 def show_graph(file_name, barnes, g_plot, radio, diametro, top_enfermedades_grado, top_instituciones_grado, top_enfermedades_btwns,
-                top_instituciones_btwns, nodos_ejes):
+                top_instituciones_btwns, nodos_ejes, plot_data):
     
     nt = Network('600px', '100%', notebook=True, bgcolor="#777271", font_color='#ffffff')
     nt.from_nx(g_plot)
@@ -137,3 +140,16 @@ def show_graph(file_name, barnes, g_plot, radio, diametro, top_enfermedades_grad
 
     st.subheader('Componente Gigante Vs. Red Entera')
     st.dataframe(nodos_ejes)
+
+    fig = go.Figure()
+    for col in plot_data:
+
+        fig.add_trace(
+            go.Scatter(
+                x=plot_data.index,
+                y=plot_data[col],
+                name=col.title()
+            )
+        )
+
+    st.plotly_chart(fig)
