@@ -8,13 +8,13 @@ import os
 import utils
 
 
-main = utils.get_data()
+author, illness, links, main = utils.get_data()
 
 st.title("Medical Resarch Network")
 st.sidebar.header("Parámetros para visualizar")
 st.sidebar.subheader("Parámetros generales")
 
-first_year, last_year = int(main.year.min()), int(main.year.max())
+first_year, last_year = int(main.Year.min()), int(main.Year.max())
 
 with st.form(key = 'Form'):
     with st.sidebar:
@@ -22,25 +22,28 @@ with st.form(key = 'Form'):
             'Años a mostrar',
             first_year, last_year, (last_year-1, last_year))
 
-        enfermedades = list(set(main['Grupo de Enfermedad']))
-        grupos = st.sidebar.multiselect(
-            'Grupo de enfermedad',
-        enfermedades,
-        enfermedades[:2]
-        )
+        with st.expander('Elegir enfermedades'):
+            enfermedades = list(set(main['Grupo']))
+            grupos = st.multiselect(
+                'Grupo',
+            enfermedades,
+            enfermedades[:2]
+            )
 
-        paises = set(main.Pais)
-        paises = st.sidebar.multiselect(
-            'Países',
-            paises,
-            paises
-        )
+        with st.expander('Elegir países'):
+            paises = set(main.Pais)
+            paises = st.multiselect(
+                'Países',
+                paises,
+                paises
+            )
+
+        giant = st.checkbox('Mostrar Componente Gigante')
+        reduce = st.checkbox('Visualizar Grafo Reducido')
+        barnes = st.checkbox('Barnes Hut')
 
         submitted = st.form_submit_button(label = 'Submit')
 
 if submitted:
     file_name = 'nx.html'
-    utils.build_graph(file_name, main, year_range, grupos, paises)
-    HtmlFile = open(file_name, 'r', encoding='utf-8')
-    source_code = HtmlFile.read() 
-    components.html(source_code, height = 600, width=700)
+    utils.build_graph(file_name, main, year_range, grupos, paises, author, giant, reduce, barnes)
