@@ -1,0 +1,13 @@
+FROM python:3.9.6
+
+EXPOSE 8501
+
+WORKDIR /dashboard
+
+COPY requirements.txt utils.py visualizacion_streamlit.py tabla_de_to_los_links.csv /dashboard/
+
+RUN pip install -r ./dashboard/requirements.txt
+
+COPY . .
+
+CMD streamlit run visualizacion_streamlit.py
