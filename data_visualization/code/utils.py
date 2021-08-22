@@ -16,8 +16,7 @@ def get_data():
     links = pd.read_csv('../../data-collection/investigaciones.csv')
     
     main = links.merge(illness, on='Enfermedad').merge(author, on='Institucion')
-    #main.drop(['id_x','id_y'], axis=1, inplace=True)
-
+    
     return author, illness, links, main
 
 @st.cache(allow_output_mutation=True)
@@ -123,10 +122,18 @@ def show_graph(file_name, barnes, g_plot, radio, diametro, top_enfermedades_grad
     st.write('Tópico de mayor Betweenness:', top_enfermedades_btwns.Nodo.values[0])
     st.write('Institución de mayor Betweenness:', top_instituciones_btwns.Nodo.values[0])
 
-    st.subheader('Tópicos más investigados:')
-    st.dataframe(top_enfermedades_grado[['Nodo','Grado']].assign(hack='').set_index('hack'))
-    st.subheader('Instituciones más activas:')
-    st.dataframe(top_instituciones_grado[['Nodo','Grado']].assign(hack='').set_index('hack'))
+    col1, col2 = st.columns(2)
+
+    col1.header("Tópicos más investigados:")
+    col1.dataframe(top_enfermedades_grado[['Nodo','Grado']].assign(hack='').set_index('hack'))
+    col2.header('Instituciones más activas:')
+    col2.dataframe(top_instituciones_grado[['Nodo','Grado']].assign(hack='').set_index('hack'))
+
+    
+    #st.subheader('Tópicos más investigados:')
+    #st.dataframe(top_enfermedades_grado[['Nodo','Grado']].assign(hack='').set_index('hack'))
+    #st.subheader('Instituciones más activas:')
+    #st.dataframe(top_instituciones_grado[['Nodo','Grado']].assign(hack='').set_index('hack'))
 
     st.subheader('Componente Gigante Vs. Red Entera')
     st.dataframe(nodos_ejes)
