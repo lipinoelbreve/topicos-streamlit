@@ -1,0 +1,116 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.css" type="text/css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis-network.min.js"> </script>
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 100%;
+            height: 600px;
+            background-color: #777271;
+            border: 1px solid lightgray;
+            position: relative;
+            float: left;
+        }
+
+        
+
+        
+
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"bipartite": 1, "font": {"color": "#ffffff"}, "group": "respiratoria", "id": "addiction", "label": "addiction", "shape": "dot", "size": 10, "title": "respiratoria"}, {"bipartite": 0, "color": "#162347", "font": {"color": "#ffffff"}, "id": "Department of Mental Health", "label": "Department of Mental Health", "shape": "dot", "size": 10, "title": "India"}, {"bipartite": 0, "color": "#162347", "font": {"color": "#ffffff"}, "id": "University of Birmingham", "label": "University of Birmingham", "shape": "dot", "size": 10, "title": "United Kingdom"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "respiratoria", "id": "sedentary behaviour ", "label": "sedentary behaviour ", "shape": "dot", "size": 10, "title": "respiratoria"}, {"bipartite": 0, "color": "#162347", "font": {"color": "#ffffff"}, "id": "University of Salento", "label": "University of Salento", "shape": "dot", "size": 10, "title": "Italy"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "genetica", "id": "secondary metabolites ", "label": "secondary metabolites ", "shape": "dot", "size": 10, "title": "genetica"}, {"bipartite": 0, "color": "#162347", "font": {"color": "#ffffff"}, "id": "University of Medicine and Pharmacy", "label": "University of Medicine and Pharmacy", "shape": "dot", "size": 10, "title": "Romania"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "genetica", "id": "Stroke", "label": "Stroke", "shape": "dot", "size": 10, "title": "genetica"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "respiratoria", "id": "renin angiotensin aldosterone system ", "label": "renin angiotensin aldosterone system ", "shape": "dot", "size": 10, "title": "respiratoria"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "genetica", "id": "vasculitis ", "label": "vasculitis ", "shape": "dot", "size": 10, "title": "genetica"}, {"bipartite": 0, "color": "#162347", "font": {"color": "#ffffff"}, "id": "Centre for Addiction and Mental Health", "label": "Centre for Addiction and Mental Health", "shape": "dot", "size": 10, "title": "Canada"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "genetica", "id": "FtM", "label": "FtM", "shape": "dot", "size": 10, "title": "genetica"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "respiratoria", "id": "brain resilience", "label": "brain resilience", "shape": "dot", "size": 10, "title": "respiratoria"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "respiratoria", "id": "immune cells", "label": "immune cells", "shape": "dot", "size": 10, "title": "respiratoria"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "genetica", "id": "flavonoids", "label": "flavonoids", "shape": "dot", "size": 10, "title": "genetica"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "genetica", "id": "advanced care planning", "label": "advanced care planning", "shape": "dot", "size": 10, "title": "genetica"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "respiratoria", "id": "diet", "label": "diet", "shape": "dot", "size": 10, "title": "respiratoria"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "respiratoria", "id": "ischemic heart disease", "label": "ischemic heart disease", "shape": "dot", "size": 10, "title": "respiratoria"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "respiratoria", "id": "anaphylaxis", "label": "anaphylaxis", "shape": "dot", "size": 10, "title": "respiratoria"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "genetica", "id": "compliance", "label": "compliance", "shape": "dot", "size": 10, "title": "genetica"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "respiratoria", "id": "Geriatrician", "label": "Geriatrician", "shape": "dot", "size": 10, "title": "respiratoria"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "genetica", "id": "stress ", "label": "stress ", "shape": "dot", "size": 10, "title": "genetica"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "genetica", "id": "Acute coronary syndrome", "label": "Acute coronary syndrome", "shape": "dot", "size": 10, "title": "genetica"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "genetica", "id": "iron chelation", "label": "iron chelation", "shape": "dot", "size": 10, "title": "genetica"}, {"bipartite": 1, "font": {"color": "#ffffff"}, "group": "genetica", "id": "Alzheimer s disease", "label": "Alzheimer s disease", "shape": "dot", "size": 10, "title": "genetica"}]);
+        edges = new vis.DataSet([{"from": "addiction", "to": "Department of Mental Health", "weight": 1, "year": 2021}, {"from": "University of Birmingham", "to": "sedentary behaviour ", "weight": 1, "year": 2020}, {"from": "University of Salento", "to": "secondary metabolites ", "weight": 1, "year": 2020}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": false,
+            "type": "continuous"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.3,
+            "damping": 0.09,
+            "gravitationalConstant": -80000,
+            "springConstant": 0.001,
+            "springLength": 250
+        },
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+
+        network = new vis.Network(container, data, options);
+	 
+        
+
+
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>
