@@ -109,8 +109,8 @@ def show_graph(file_name, barnes, grupos, paises, g_plot, radio, diametro, top_e
     source_code = HtmlFile.read() 
 
     st.title('Visualización de la Red')
-    st.write('Países:', paises)
-    st.write('Enfermedades:', grupos)
+    st.write('Países:', ', '.join(paises))
+    st.write('Enfermedades:', ', '.join(grupos))
     components.html(source_code, height = 600, width=700)
 
     st.title('Métricas Principales')
