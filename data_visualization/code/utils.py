@@ -10,7 +10,8 @@ import plotly.graph_objects as go
 
 @st.cache
 def get_data():
-    main = pd.read_csv('../../data-processing/tabla_de_to_los_links.csv')
+    #main = pd.read_csv('../../data-processing/tabla_de_to_los_links.csv')
+    main = pd.read_csv('/app/topicos-streamlit/data-processing/tabla_de_to_los_links.csv')
     
     return main
 
