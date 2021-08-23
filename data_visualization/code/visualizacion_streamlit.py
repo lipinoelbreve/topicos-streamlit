@@ -38,9 +38,10 @@ with st.form(key = 'Form'):
         with st.expander('Elegir países'):
             paises = set(main.pais)
             paises_aux = []
-            for pais in ['United Kingdom','United States','Argentina','China','India']:
+            for pais in ['Argentina', 'United Kingdom', 'United States','China','India']:
                 if pais in paises:
                     paises_aux.append(pais)
+                    break
             
             if len(paises_aux) == 0:
                 paises_aux = np.random.choice(list(paises))
@@ -65,4 +66,4 @@ if submitted:
     file_name = 'nx.html'
     params_dict = utils.build_graph(main, year_range, grupos, paises_seleccionados, giant, reduce)
     
-    utils.show_graph(file_name, barnes, **params_dict)
+    utils.show_graph(file_name, barnes, grupos, paises_seleccionados, **params_dict)

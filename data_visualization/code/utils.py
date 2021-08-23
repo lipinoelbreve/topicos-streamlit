@@ -96,7 +96,7 @@ def build_graph(main, year_range, grupos, paises, giant, reduce):
      'plot_data':plot_data
     }
     
-def show_graph(file_name, barnes, g_plot, radio, diametro, top_enfermedades_grado, top_instituciones_grado, nodos_ejes, plot_data):
+def show_graph(file_name, barnes, grupos, paises, g_plot, radio, diametro, top_enfermedades_grado, top_instituciones_grado, nodos_ejes, plot_data):
     
     nt = Network('600px', '100%', notebook=True, bgcolor="#777271", font_color='#ffffff')
     nt.from_nx(g_plot)
@@ -109,6 +109,8 @@ def show_graph(file_name, barnes, g_plot, radio, diametro, top_enfermedades_grad
     source_code = HtmlFile.read() 
 
     st.title('Visualización de la Red')
+    st.write('Países:', paises)
+    st.write('Enfermedades:', grupos)
     components.html(source_code, height = 600, width=700)
 
     st.title('Métricas Principales')
